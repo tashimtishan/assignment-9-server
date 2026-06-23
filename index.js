@@ -34,6 +34,8 @@ const client = new MongoClient(uri, {
   }
 });
 
+
+// this is the main function
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
