@@ -46,6 +46,19 @@ async function run() {
       res.json(result);
     });
 
+    app.patch("/bookings/:id", async (req,res)=>{
+      const {id}= req.params
+      const updateData = req.body
+      const result = await bookingCollection.updateOne( { _id: new ObjectId(id) },
+        { $set: updateData })
+        res.json(result)
+    })
+    app.delete("/bookings/:id", async (req, res) => {
+    const { id } = req.params;
+    const result = await bookingCollection.deleteOne({ _id: new ObjectId(id) });
+    res.json(result);
+});
+
     app.get("/bookings", async (req, res) => {
       const result = await bookingCollection.find().toArray();
       res.json(result)
