@@ -37,16 +37,26 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    // await client.connect();
+    await client.connect();
 
     const db = client.db("DocAppoint");
     const doctorsCollection = db.collection("doctors");
     const bookingCollection = db.collection("bookings");
 
+
     app.get("/doctors", async (req, res) => {
-      const result = await doctorsCollection.find().toArray();
-      res.json(result);
-    })
+    try {
+        const result = await doctorsCollection.find().toArray();
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+      app.get("/doctors/specialty/:specialty", async (req, res) => {
+    const { specialty } = req.params;
+    const result = await doctorsCollection.find({ specialty: specialty }).toArray();
+    res.json(result);
+});
 
     app.get("/doctors/:id", async (req, res) => {
       const { id } = req.params;
@@ -96,10 +106,18 @@ async function run() {
       res.json(result || [])
     })
 
-    app.get("/doctors/specialty/:specialty", async (req, res) => {
-    const { specialty } = req.params;
-    const result = await doctorsCollection.find({ specialty: specialty }).toArray();
-    res.json(result);
+  
+
+
+
+app.get("/stats", async (req, res) => {
+    try {
+        const totalDoctors = await doctorsCollection.countDocuments();
+        const totalBookings = await bookingCollection.countDocuments();
+        res.json({ totalDoctors, totalBookings });
+    } catch (err) {
+        res.status(500).json({ message: "Internal server error" });
+    }
 });
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
