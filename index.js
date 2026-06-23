@@ -37,7 +37,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const db = client.db("DocAppoint");
     const doctorsCollection = db.collection("doctors");
@@ -93,10 +93,16 @@ async function run() {
 
     app.get("/bookings", verifyToken, async (req, res) => {
       const result = await bookingCollection.find().toArray();
-      res.json(result)
+      res.json(result || [])
     })
+
+    app.get("/doctors/specialty/:specialty", async (req, res) => {
+    const { specialty } = req.params;
+    const result = await doctorsCollection.find({ specialty: specialty }).toArray();
+    res.json(result);
+});
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
